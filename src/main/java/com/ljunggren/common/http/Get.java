@@ -1,7 +1,6 @@
 package com.ljunggren.common.http;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -16,8 +15,10 @@ public class Get extends HttpBase {
 
 	public static Response request(Request request) throws ClientProtocolException, IOException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException, URISyntaxException {
 		URIBuilder uriBuilder = new URIBuilder(request.getUrl());
-		URI uri = uriBuilder.setParameters(request.getUrlParameters()).build();
-		HttpGet get = new HttpGet(uri);
+		if (request.getUrlParameters() != null && !request.getUrlParameters().isEmpty()) {
+			uriBuilder.setParameters(request.getUrlParameters());
+		}
+		HttpGet get = new HttpGet(uriBuilder.build());
 		HttpClientBuilder clientBuilder = HttpClientBuilder.create();
 		addCertificateBuilder(request, clientBuilder);
 
