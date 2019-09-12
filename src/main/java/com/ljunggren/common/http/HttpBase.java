@@ -71,6 +71,9 @@ public class HttpBase {
 		addCookies(cookiejar, request.getCookies());
 		clientBuilder.setDefaultCookieStore(cookiejar);
 		
+    	if (request.getHeaders() != null) {
+    		restMethod.setHeaders(request.getHeaders().stream().toArray(Header[]::new));
+    	}
 		if (request.getNtlmProxy() != null) {
 			setNtlmProxy(request, clientBuilder, requestConfigBuilder);
 		}

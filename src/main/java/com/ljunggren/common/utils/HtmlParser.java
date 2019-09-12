@@ -16,6 +16,11 @@ public class HtmlParser {
 		return getValueById(parsedHtml, id);
 	}
 	
+	public static Element getElementById(String html, String id) {
+		Document parsedHtml = parseHtml(html);
+		return getElementById(parsedHtml, id);
+	}
+	
 	public static String getValueByName(String html, String name) {
 		Document parsedHtml = parseHtml(html);
 		return getValueByName(parsedHtml, name);
@@ -34,6 +39,10 @@ public class HtmlParser {
 	private static String getValueById(Document parsedHtml, String id) {
 		Element element = parsedHtml.getElementById(id);
 		return element == null ? "" : element.attr("value");
+	}
+	
+	private static Element getElementById(Document parsedHtml, String id) {
+		return parsedHtml.getElementById(id);
 	}
 	
 	private static String getValueByName(Document parsedHtml, String name) {

@@ -15,7 +15,7 @@ import org.json.JSONObject;
 
 import com.jcraft.jsch.JSchException;
 
-public class JSONUtils {
+public class JsonUtils {
 
     public static String objectToJson(Object object) {
         String json = new String();

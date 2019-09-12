@@ -3,6 +3,7 @@ package com.ljunggren.common.http;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.NameValuePair;
 import org.apache.http.cookie.Cookie;
 
@@ -21,6 +22,7 @@ public class Request {
 	private boolean redirect;
 	private boolean acceptSelfSignedCertificates;
 	private List<NameValuePair> urlParameters;
+	private List<Header> headers;
 	private List<Cookie> cookies;
 	private Integer connectionTimeout;
 	private Integer sockectTimeout;
@@ -52,6 +54,11 @@ public class Request {
 	
 	public Request setUrlParameters(List<NameValuePair> urlParameters) {
 		this.urlParameters = urlParameters;
+		return this;
+	}
+	
+	public Request setHeaders(List<Header> headers) {
+		this.headers = headers;
 		return this;
 	}
 	
@@ -99,6 +106,10 @@ public class Request {
 		return urlParameters;
 	}
 
+	public List<Header> getHeaders() {
+		return headers;
+	}
+	
 	public List<Cookie> getCookies() {
 		return cookies;
 	}

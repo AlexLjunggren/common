@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.http.Header;
 import org.apache.http.NameValuePair;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.ljunggren.common.http.Authorization;
@@ -23,6 +25,7 @@ public class Navigation {
 		acceptSelfSignedCertificates = true;
 		cookies = new ArrayList<Cookie>();
 		urlParameters = new ArrayList<NameValuePair>();
+		headers = new ArrayList<Header>();
 		connectionTimeout = 10000;
 		socketTimeout = 60000;
 	}
@@ -35,6 +38,7 @@ public class Navigation {
 	private NtlmProxy ntlmProxy;
 	private Authorization authorization;
 	private List<NameValuePair> urlParameters;
+	private List<Header> headers;
 	private RequestType requestType;
 	private Integer connectionTimeout;
 	private Integer socketTimeout;
@@ -74,6 +78,11 @@ public class Navigation {
 		return this;
 	}
 	
+	public Navigation addHeader(String name, String value) {
+		this.headers.add(new BasicHeader(name, value));
+		return this;
+	}
+	
 	public Navigation authorization(Authorization authorization) {
 		this.authorization = authorization;
 		return this;
@@ -102,6 +111,7 @@ public class Navigation {
 	public void request() {
 		Request request = new Request(url)
 			.setUrlParameters(urlParameters)
+			.setHeaders(headers)
 			.setNtlmProxy(ntlmProxy)
 			.setAuthorization(authorization)
 			.redirect(redirect)
