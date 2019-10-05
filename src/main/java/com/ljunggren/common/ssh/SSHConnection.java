@@ -1,8 +1,7 @@
 package com.ljunggren.common.ssh;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
 
@@ -21,26 +20,54 @@ public class SSHConnection {
 	private JSchException sessionException;
 	private Date lastRetry;
 	
-	public synchronized String execute(SSHRequest sshRequest) throws JSchException, IOException  {
+	public synchronized String execute(SSHRequest sshRequest) throws JSchException, IOException, InterruptedException  {
 		if (session == null || !session.isConnected()) {
 			startSession(sshRequest);
 		}
         String command = sshRequest.getExecutionString();
-        StringBuilder output = new StringBuilder();
         ChannelExec channel=(ChannelExec) session.openChannel("exec");
-        BufferedReader in = new BufferedReader(new InputStreamReader(channel.getInputStream()));
+		InputStream inputStream = channel.getInputStream();
+		InputStream errorStream = channel.getExtInputStream();
         channel.setCommand(command);
+        channel.setInputStream(null);
         channel.connect();
 
-        String msg = null;
-        while((msg =in.readLine()) != null) {
-            output.append(msg);
-        }
+        String output = readResponse(channel, inputStream, errorStream);
         channel.disconnect();
         if (!keepAlive) {
             disconnect();
         }
-        return output.toString().trim();
+        return output.trim();
+	}
+	
+	private String readResponse(ChannelExec channel, InputStream inputStream, InputStream errorStream) throws IOException, InterruptedException {
+		// code pulled from jsch example doc
+		StringBuilder sb = new StringBuilder();
+		byte[] tmp = new byte[1024];
+		while (true) {
+			while (inputStream.available() > 0) {
+				int i = inputStream.read(tmp, 0, 1024);
+				if (i < 0) {
+					break;
+				}
+				sb.append(new String(tmp, 0, i));
+			}
+			while (errorStream.available() > 0) {
+				int i = errorStream.read(tmp, 0, 1024);
+				if (i < 0) {
+					break;
+				}
+				sb.append(new String(tmp, 0, i));
+			}
+			if (channel.isClosed()) {
+				if ((inputStream.available() > 0) || (errorStream.available() > 0)) {
+					continue;
+				}
+				break;
+			}
+			Thread.sleep(1000);
+		}
+		return sb.toString();
 	}
 	
 	public void startSession(SSHRequest sshRequest) throws JSchException {

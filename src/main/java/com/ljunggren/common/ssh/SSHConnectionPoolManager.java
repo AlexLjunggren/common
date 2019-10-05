@@ -10,7 +10,7 @@ public class SSHConnectionPoolManager {
 
 	private Set<SSHConnection> sshConnections = new HashSet<SSHConnection>();
 	
-	public String execute(SSHRequest sshRequest) throws JSchException, IOException {
+	public String execute(SSHRequest sshRequest) throws JSchException, IOException, InterruptedException {
 		SSHConnectionProperties requestedConnection = sshRequest.getSshConnectionProperties();
 		SSHConnection registeredConnection = sshConnections.stream()
 				.filter(connection -> isSameConnection(connection, requestedConnection))
